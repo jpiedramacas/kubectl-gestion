@@ -98,3 +98,15 @@ kubectl run -i --tty load-generator --rm --image=busybox --restart=Never -- /bin
 Este comando generará tráfico continuo hacia la URL del servicio `my-app`, lo que debería activar el escalado automático si la carga de CPU aumenta por encima del 10%.
 
 Con estos pasos, has implementado con éxito el escalado automático en Kubernetes y has observado cómo responde tu aplicación a las fluctuaciones de la carga de trabajo.
+
+### 5. Habilitación de Metrics Server en Minikube
+
+Antes de utilizar el Horizontal Pod Autoscaler (HPA), necesitamos asegurarnos de que Metrics Server esté habilitado en Minikube. Metrics Server proporciona recursos métricos de los nodos y los pods del clúster, lo que es fundamental para que el HPA funcione correctamente.
+
+Para habilitar Metrics Server en Minikube, puedes utilizar el siguiente comando:
+
+```bash
+minikube addons enable metrics-server
+```
+
+Este comando activará Metrics Server en tu clúster Minikube, permitiendo que el HPA acceda a las métricas necesarias para ajustar automáticamente el número de réplicas de tus pods. Asegúrate de ejecutar este comando antes de aplicar el HPA.
