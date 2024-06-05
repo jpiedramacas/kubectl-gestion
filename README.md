@@ -171,4 +171,43 @@ Este comando crea o actualiza un HPA basado en las especificaciones del archivo 
 
 ---
 
-Este documento cubre los fundamentos para gestionar recursos en Kubernetes, específicamente los Deployments y el escalado de aplicaciones. Estos ejemplos y comandos proporcionan una guía práctica para implementar y mantener aplicaciones en un clúster de Kubernetes.
+## Servicios y Networking
+
+Los servicios en Kubernetes permiten exponer aplicaciones en el clúster y gestionar el tráfico de red.
+
+### Tipos de servicios (ClusterIP, NodePort, LoadBalancer)
+
+- **ClusterIP:** Exponiendo el servicio dentro del clúster.
+- **NodePort:** Exponiendo el servicio en cada nodo del clúster en un puerto estático.
+- **LoadBalancer:** Exponiendo el servicio utilizando un balanceador de carga externo.
+
+#### Ejemplo de servicio ClusterIP:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+spec:
+  selector:
+    app: my-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 9376
+  type: ClusterIP
+```
+
+Este ejemplo define un servicio llamado `my-service` con un tipo `ClusterIP`, exponiendo el servicio dentro del clúster en el puerto 80, y redirigiendo el tráfico al puerto 9376 de los Pods que coincidan con la etiqueta `app: my-app`.
+
+#### Crear el servicio:
+
+```sh
+kubectl apply -f service.yaml
+```
+
+Este comando crea el servicio `my-service` basado en las especificaciones del archivo `service.yaml`.
+
+---
+
+Este documento cubre los fundamentos para gestionar recursos en Kubernetes, incluyendo Deployments, el escalado de aplicaciones y servicios de red. Los ejemplos y comandos proporcionados ofrecen una guía práctica para implementar y mantener aplicaciones en un clúster de Kubernetes.
