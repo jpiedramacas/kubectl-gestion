@@ -1,24 +1,27 @@
 # Gestión de Recursos en Kubernetes
 
-Este documento detalla los conceptos y pasos para la gestión de recursos en Kubernetes, desde la creación de pods hasta la implementación y escalado de aplicaciones. Se explicarán los comandos y códigos utilizados para la correcta configuración y manejo de los recursos dentro de un clúster de Kubernetes.
+Este documento detalla los conceptos y pasos para la gestión de recursos en Kubernetes, desde la creación de Pods hasta la implementación y escalado de aplicaciones. Se explicarán los comandos y códigos utilizados para la correcta configuración y manejo de los recursos dentro de un clúster de Kubernetes.
 
 ## Tabla de Contenidos
 1. [Introducción](#introducción)
 2. [Creación y Gestión de Pods](#creación-y-gestión-de-pods)
-   - [Definición de Pods con YAML](#yaml-para-definir-pods)
-   - [Estrategias de Despliegue de Pods](#estrategias-de-despliegue-de-pods)
 3. [Deployments y Scaling](#deployments-y-scaling)
-   - [Estrategias de Despliegue](#estrategias-de-despliegue)
-   - [Actualización de un Deployment](#actualización-de-un-deployment)
+4. [Servicios y Networking](#servicios-y-networking)
 
 ## Introducción
-La gestión de recursos en Kubernetes es crucial para el despliegue, mantenimiento y escalado eficiente de aplicaciones en un clúster. En esta sección se abordan la creación y gestión de diferentes tipos de recursos, desde pods hasta servicios y almacenamiento persistente.
 
-## Creación y Gestión de Pods
-### YAML para definir Pods
-Un pod es la unidad básica de despliegue en Kubernetes. Para definir un pod, se utiliza un archivo YAML que describe sus características, incluyendo los contenedores que contiene, las imágenes de esos contenedores y las variables de entorno.
+La gestión de recursos en Kubernetes es crucial para el despliegue, mantenimiento y escalado eficiente de aplicaciones en un clúster. En esta sección se abordan la creación y gestión de diferentes tipos de recursos, desde Pods hasta servicios y almacenamiento persistente.
 
-**Ejemplo de YAML para un pod:**
+---
+
+## 1. Creación y Gestión de Pods
+
+**Descripción:**
+Los Pods son la unidad básica de despliegue en Kubernetes. Un Pod puede contener uno o más contenedores que comparten la misma red y almacenamiento.
+
+### 1.1. YAML para definir Pods
+
+**Archivo YAML para definir un Pod:**
 ```yaml
 apiVersion: v1
 kind: Pod
@@ -32,31 +35,26 @@ spec:
     - containerPort: 80
 ```
 
-**Comando para crear un pod a partir de un archivo YAML:**
-```sh
-kubectl apply -f pod-definition.yaml
-```
-Este comando crea el pod definido en el archivo `pod-definition.yaml`.
+**Comandos:**
+1. **Crear un Pod a partir de un archivo YAML:**
+   ```sh
+   kubectl apply -f pod-definition.yaml
+   ```
+2. **Verificación del estado del Pod:**
+   ```sh
+   kubectl get pods
+   ```
 
-**Verificación del estado del pod:**
-```sh
-kubectl get pods
-```
-Este comando muestra el estado de todos los pods en el clúster, permitiendo verificar que el pod se haya creado correctamente.
+### 1.2. Estrategias de Despliegue de Pods
 
-### Estrategias de Despliegue de Pods
-Existen varias estrategias para desplegar pods en Kubernetes:
+**Estrategias:**
+- **Despliegue manual:** Creación de Pods de manera manual usando archivos YAML.
+  ```sh
+  kubectl run nginx --image=nginx --port=80
+  ```
+- **Despliegue automatizado:** Uso de controladores como Deployments, ReplicaSets y DaemonSets para gestionar Pods de manera automática y escalable.
 
-- **Despliegue manual:** Creación de pods de manera manual usando archivos YAML.
-- **Despliegue automatizado:** Uso de controladores como Deployments, ReplicaSets y DaemonSets para gestionar pods de manera automática y escalable.
-
-**Ejemplo de despliegue manual:**
-```sh
-kubectl run nginx --image=nginx --port=80
-```
-Este comando crea un pod con el contenedor de nginx expuesto en el puerto 80.
-
-**Uso de Deployments para automatizar el despliegue:**
+**Ejemplo de archivo YAML para un Deployment:**
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -79,18 +77,23 @@ spec:
         - containerPort: 80
 ```
 
-**Aplicación del Deployment:**
+**Comando para aplicar el Deployment:**
 ```sh
 kubectl apply -f deployment.yaml
 ```
-Este comando crea el Deployment definido en el archivo `deployment.yaml`, gestionando el número de réplicas especificado y facilitando actualizaciones.
 
-## Deployments y Scaling
+---
+
+## 2. Deployments y Scaling
+
+**Descripción:**
 Los Deployments permiten gestionar el ciclo de vida de las aplicaciones, incluyendo el escalado y las actualizaciones.
 
-### Estrategias de Despliegue
-- **Recreate:** Elimina todos los pods existentes antes de crear nuevos pods con la versión actualizada.
-- **RollingUpdate:** Actualiza los pods gradualmente para minimizar el tiempo de inactividad.
+### 2.1. Estrategias de Despliegue
+
+**Estrategias de Despliegue:**
+- **Recreate:** Elimina todos los Pods existentes antes de crear nuevos Pods con la versión actualizada.
+- **RollingUpdate:** Actualiza los Pods gradualmente para minimizar el tiempo de inactividad.
 
 **Ejemplo de RollingUpdate en un Deployment:**
 ```yaml
@@ -102,17 +105,45 @@ spec:
       maxSurge: 1
 ```
 
-### Actualización de un Deployment
-Para actualizar un Deployment a una nueva versión de la imagen de contenedor, se utiliza el siguiente comando:
+**Comando para actualizar un Deployment:**
 ```sh
 kubectl set image deployment/nginx-deployment nginx=nginx:1.16.1
 ```
-Este comando actualiza la imagen del contenedor nginx en el Deployment `nginx-deployment` a la versión 1.16.1, aplicando la estrategia de actualización definida (por defecto es RollingUpdate).
 
 ---
 
-Este documento proporciona una guía esencial para gestionar recursos en Kubernetes, facilitando la creación, despliegue y escalado de aplicaciones en un entorno de clúster. Cada paso incluye ejemplos prácticos y comandos específicos para garantizar una implementación exitosa y eficiente.
+## 3. Servicios y Networking
+
+**Descripción:**
+Los Servicios en Kubernetes exponen una aplicación corriendo en un conjunto de Pods y facilitan el descubrimiento y el balanceo de carga.
+
+**Tipos de Servicios:**
+- **ClusterIP:** Exposición interna dentro del clúster.
+- **NodePort:** Exposición externa en un puerto específico de cada nodo.
+- **LoadBalancer:** Exposición externa utilizando un balanceador de carga provisto por el proveedor de la nube.
+
+**Ejemplo de archivo YAML para un Servicio de tipo NodePort:**
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+spec:
+  selector:
+    app: nginx
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+    nodePort: 30007
+  type: NodePort
+```
+
+**Comando para aplicar el Servicio:**
+```sh
+kubectl apply -f service.yaml
+```
 
 ---
 
- 
+Este documento cubre los fundamentos para gestionar recursos en Kubernetes, desde la creación y gestión de Pods, despliegues y escalado, hasta la configuración de servicios y networking. Estos ejemplos y comandos proporcionan una guía práctica para implementar y mantener aplicaciones en un clúster de Kubernetes【6:2†source】【6:3†source】【6:4†source】.
