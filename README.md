@@ -146,4 +146,4 @@ kubectl apply -f service.yaml
 
 ---
 
-Este documento cubre los fundamentos para gestionar recursos en Kubernetes, desde la creación y gestión de Pods, despliegues y escalado, hasta la configuración de servicios y networking. Estos ejemplos y comandos proporcionan una guía práctica para implementar y mantener aplicaciones en un clúster de Kubernetes【6:2†source】【6:3†source】【6:4†source】.
+Este documento cubre los fundamentos para gestionar recursos en Kubernetes, desde la creación y gestión de Pods, despliegues y escalado, hasta la configuración de servicios y networking. Estos ejemplos y comandos proporcionan una guía práctica para implementar y mantener aplicaciones en un clúster de Kubernetes.
