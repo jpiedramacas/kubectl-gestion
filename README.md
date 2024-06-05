@@ -1,101 +1,32 @@
 # Gestión de Recursos en Kubernetes
 
-Este documento detalla los conceptos y pasos para la gestión de recursos en Kubernetes, desde la creación de Pods hasta la implementación y escalado de aplicaciones. Se explicarán los comandos y códigos utilizados para la correcta configuración y manejo de los recursos dentro de un clúster de Kubernetes.
+Este documento detalla los conceptos y pasos para la gestión de recursos en Kubernetes, con un enfoque específico en los Deployments y el escalado de aplicaciones. Se explicarán los comandos y archivos YAML necesarios para la correcta configuración y manejo de los recursos dentro de un clúster de Kubernetes.
 
 ## Tabla de Contenidos
 1. [Introducción](#introducción)
-2. [Creación y Gestión de Pods](#creación-y-gestión-de-pods)
-3. [Deployments y Scaling](#deployments-y-scaling)
-4. [Servicios y Networking](#servicios-y-networking)
+2. [Deployments y Scaling](#deployments-y-scaling)
+   - [Estrategias de despliegue](#estrategias-de-despliegue)
+   - [Autoescalado de aplicaciones (Horizontal Pod Autoscaler)](#autoescalado-de-aplicaciones-horizontal-pod-autoscaler)
 
 ## Introducción
 
-La gestión de recursos en Kubernetes es crucial para el despliegue, mantenimiento y escalado eficiente de aplicaciones en un clúster. En esta sección se abordan la creación y gestión de diferentes tipos de recursos, desde Pods hasta servicios y almacenamiento persistente.
+La gestión de recursos en Kubernetes es crucial para el despliegue, mantenimiento y escalado eficiente de aplicaciones en un clúster. En esta sección se abordan los Deployments y el escalado de aplicaciones, fundamentales para la gestión del ciclo de vida de las aplicaciones.
 
----
+## Deployments y Scaling
 
-## 1. Creación y Gestión de Pods
+### Estrategias de despliegue
 
-**Descripción:**
-Los Pods son la unidad básica de despliegue en Kubernetes. Un Pod puede contener uno o más contenedores que comparten la misma red y almacenamiento.
-
-### 1.1. YAML para definir Pods
-
-**Archivo YAML para definir un Pod:**
-```yaml
-apiVersion: v1
-kind: Pod
-metadata:
-  name: my-pod
-spec:
-  containers:
-  - name: my-container
-    image: nginx:latest
-    ports:
-    - containerPort: 80
-```
-
-**Comandos:**
-1. **Crear un Pod a partir de un archivo YAML:**
-   ```sh
-   kubectl apply -f pod-definition.yaml
-   ```
-2. **Verificación del estado del Pod:**
-   ```sh
-   kubectl get pods
-   ```
-
-### 1.2. Estrategias de Despliegue de Pods
-
-**Estrategias:**
-- **Despliegue manual:** Creación de Pods de manera manual usando archivos YAML.
-  ```sh
-  kubectl run nginx --image=nginx --port=80
-  ```
-- **Despliegue automatizado:** Uso de controladores como Deployments, ReplicaSets y DaemonSets para gestionar Pods de manera automática y escalable.
-
-**Ejemplo de archivo YAML para un Deployment:**
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nginx-deployment
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: nginx
-  template:
-    metadata:
-      labels:
-        app: nginx
-    spec:
-      containers:
-      - name: nginx
-        image: nginx:latest
-        ports:
-        - containerPort: 80
-```
-
-**Comando para aplicar el Deployment:**
-```sh
-kubectl apply -f deployment.yaml
-```
-
----
-
-## 2. Deployments y Scaling
-
-**Descripción:**
 Los Deployments permiten gestionar el ciclo de vida de las aplicaciones, incluyendo el escalado y las actualizaciones.
 
-### 2.1. Estrategias de Despliegue
+#### Estrategias de Despliegue
 
-**Estrategias de Despliegue:**
 - **Recreate:** Elimina todos los Pods existentes antes de crear nuevos Pods con la versión actualizada.
 - **RollingUpdate:** Actualiza los Pods gradualmente para minimizar el tiempo de inactividad.
 
-**Ejemplo de RollingUpdate en un Deployment:**
+#### Ejemplo de RollingUpdate en un Deployment
+
+Para implementar una estrategia de RollingUpdate en un Deployment, se define en el archivo YAML de la siguiente manera:
+
 ```yaml
 spec:
   strategy:
@@ -105,45 +36,139 @@ spec:
       maxSurge: 1
 ```
 
-**Comando para actualizar un Deployment:**
+En este ejemplo:
+- `type: RollingUpdate`: Define que se usará la estrategia RollingUpdate.
+- `maxUnavailable: 1`: Define el número máximo de Pods que pueden estar no disponibles durante la actualización.
+- `maxSurge: 1`: Define el número máximo de Pods adicionales que pueden crearse más allá del número deseado de Pods durante la actualización.
+
+#### Comando para actualizar un Deployment
+
+Para actualizar la imagen de un contenedor en un Deployment existente, se utiliza el siguiente comando:
+
 ```sh
 kubectl set image deployment/nginx-deployment nginx=nginx:1.16.1
 ```
 
----
+Este comando actualiza el Deployment `nginx-deployment` para usar la imagen `nginx:1.16.1`.
 
-## 3. Servicios y Networking
+#### Ejemplo de definición de un Deployment en YAML
 
-**Descripción:**
-Los Servicios en Kubernetes exponen una aplicación corriendo en un conjunto de Pods y facilitan el descubrimiento y el balanceo de carga.
-
-**Tipos de Servicios:**
-- **ClusterIP:** Exposición interna dentro del clúster.
-- **NodePort:** Exposición externa en un puerto específico de cada nodo.
-- **LoadBalancer:** Exposición externa utilizando un balanceador de carga provisto por el proveedor de la nube.
-
-**Ejemplo de archivo YAML para un Servicio de tipo NodePort:**
 ```yaml
-apiVersion: v1
-kind: Service
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: my-service
+  name: my-deployment
+  labels:
+    app: my-app
 spec:
+  replicas: 3
   selector:
-    app: nginx
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 80
-    nodePort: 30007
-  type: NodePort
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: my-container
+        image: nginx:latest
+        ports:
+        - containerPort: 80
 ```
 
-**Comando para aplicar el Servicio:**
+En este ejemplo:
+- `apiVersion: apps/v1`: Especifica la versión de la API de Kubernetes para aplicaciones.
+- `kind: Deployment`: Define que se está creando un Deployment.
+- `metadata`: Contiene información sobre el Deployment, como su nombre (`my-deployment`) y etiquetas.
+- `spec`: Describe las características del Deployment.
+  - `replicas: 3`: Número de réplicas del Pod que se desean.
+  - `selector`: Selector de etiquetas para identificar los Pods gestionados por este Deployment.
+    - `matchLabels`: Etiquetas que deben coincidir.
+      - `app: my-app`: Etiqueta que deben tener los Pods.
+  - `template`: Plantilla para los Pods creados por el Deployment.
+    - `metadata`: Etiquetas aplicadas a los Pods.
+      - `labels`: Etiquetas de los Pods.
+        - `app: my-app`: Etiqueta `app` con valor `my-app`.
+    - `spec`: Descripción de los contenedores en los Pods.
+      - `containers`: Lista de contenedores.
+        - `name: my-container`: Nombre del contenedor.
+        - `image: nginx:latest`: Imagen del contenedor.
+        - `ports`: Lista de puertos expuestos por el contenedor.
+          - `containerPort: 80`: Puerto expuesto por el contenedor.
+
+#### Comando para aplicar el Deployment
+
 ```sh
-kubectl apply -f service.yaml
+kubectl apply -f deployment.yaml
 ```
+Este comando crea o actualiza un Deployment basado en las especificaciones del archivo `deployment.yaml`.
+
+### Autoescalado de aplicaciones (Horizontal Pod Autoscaler)
+
+El autoescalado horizontal (Horizontal Pod Autoscaler, HPA) permite escalar automáticamente el número de Pods en función de la carga.
+
+#### Crear un HPA
+
+Para crear un Horizontal Pod Autoscaler, se usa el siguiente comando:
+
+```sh
+kubectl autoscale deployment nginx-deployment --cpu-percent=50 --min=1 --max=10
+```
+
+Este comando configura un HPA para el Deployment `nginx-deployment`, ajustando automáticamente el número de réplicas entre 1 y 10 en función del uso de CPU, manteniendo un promedio de uso de CPU del 50%.
+
+#### Verificar el estado del HPA
+
+Para verificar el estado del HPA, se utiliza el siguiente comando:
+
+```sh
+kubectl get hpa
+```
+
+Este comando muestra el estado actual de todos los HPA en el clúster.
+
+#### Ejemplo Práctico
+
+Para escalar horizontalmente una aplicación en respuesta a la carga, configuramos un HPA definiendo un objeto HPA y asociándolo con un Deployment existente.
+
+**Ejemplo de archivo YAML para un HPA:**
+
+```yaml
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: webapp-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: webapp
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 50
+```
+
+En este ejemplo:
+- `apiVersion: autoscaling/v1`: Especifica la versión de la API de Kubernetes para autoescalado.
+- `kind: HorizontalPodAutoscaler`: Define que se está creando un HPA.
+- `metadata`: Contiene información sobre el HPA, como su nombre (`webapp-hpa`).
+- `spec`: Describe las características del HPA.
+  - `scaleTargetRef`: Referencia al Deployment que será escalado.
+    - `apiVersion: apps/v1`: Versión de la API del Deployment.
+    - `kind: Deployment`: Tipo de recurso que será escalado.
+    - `name: webapp`: Nombre del Deployment que será escalado.
+  - `minReplicas: 2`: Número mínimo de réplicas.
+  - `maxReplicas: 10`: Número máximo de réplicas.
+  - `targetCPUUtilizationPercentage: 50`: Uso de CPU objetivo para el autoescalado.
+
+#### Comando para aplicar el HPA
+
+```sh
+kubectl apply -f hpa.yaml
+```
+Este comando crea o actualiza un HPA basado en las especificaciones del archivo `hpa.yaml`.
 
 ---
 
-Este documento cubre los fundamentos para gestionar recursos en Kubernetes, desde la creación y gestión de Pods, despliegues y escalado, hasta la configuración de servicios y networking. Estos ejemplos y comandos proporcionan una guía práctica para implementar y mantener aplicaciones en un clúster de Kubernetes.
+Este documento cubre los fundamentos para gestionar recursos en Kubernetes, específicamente los Deployments y el escalado de aplicaciones. Estos ejemplos y comandos proporcionan una guía práctica para implementar y mantener aplicaciones en un clúster de Kubernetes.
