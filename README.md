@@ -1,6 +1,4 @@
-Por supuesto, aquí tienes una versión más detallada del README:
-
-## README: Escalado Automático con Kubernetes
+## Escalado Automático con Kubernetes
 
 En este documento, vamos a explorar cómo implementar el escalado automático en Kubernetes utilizando un Horizontal Pod Autoscaler (HPA). También veremos cómo desplegar una aplicación, exponerla a través de un servicio y ejecutar un generador de carga para simular tráfico.
 
