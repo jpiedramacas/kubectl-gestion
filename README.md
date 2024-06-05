@@ -184,4 +184,8 @@ spec:
 kubectl apply -f hpa.yaml
 ```
 
-Esta guía proporciona una base sólida para gestionar recursos en Kubernetes, incluyendo la creación y gestión de pods, despliegues y el escalado automático de aplicaciones. Para un uso más avanzado y opciones adicionales, consulta la [documentación oficial de Kubernetes](https://kubernetes.io/docs/home/).
+Esta guía proporciona una base sólida para gestionar recursos en Kubernetes, incluyendo la creación y gestión de pods, despliegues y el escalado automático de aplicaciones. Para un uso más avanzado y opciones adicionales.
+
+Documentacion oficial de Kubernetes:
+[Deployment](https://kubernetes.io/es/docs/concepts/workloads/controllers/deployment/)
+[Horizontal Pod Autoscaling](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
